@@ -135,8 +135,9 @@ NSString *kKeychainKeyIdentifier;
     [queryDictionary setObject:(id) kCFBooleanTrue forKey:(id)kSecReturnData];
     [queryDictionary setObject:(id) kSecClassGenericPassword forKey:(id)kSecClass];
 
-    NSDictionary *returnedDictionary = [[[NSMutableDictionary alloc] init] autorelease];
+    NSDictionary *returnedDictionary = nil;
     OSStatus     keychainError       = SecItemCopyMatching((CFDictionaryRef)queryDictionary, (CFTypeRef *)&returnedDictionary);
+    [returnedDictionary autorelease];
     if (keychainError == errSecSuccess)
     {
         NSData *rawData = [returnedDictionary objectForKey:(id)kSecValueData];

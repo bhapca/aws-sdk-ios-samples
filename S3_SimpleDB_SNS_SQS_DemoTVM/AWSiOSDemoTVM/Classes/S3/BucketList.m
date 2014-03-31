@@ -43,21 +43,23 @@
             [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
         });
 
-        NSArray *bucketNames = [[AmazonClientManager s3] listBuckets];
-        if (buckets == nil) {
-            buckets = [[NSMutableArray alloc] initWithCapacity:[bucketNames count]];
-        }
-        else {
-            [buckets removeAllObjects];
-        }
-
-        if (bucketNames != nil) {
-            for (S3Bucket *bucket in bucketNames) {
-                [buckets addObject:[bucket name]];
+        @autoreleasepool {
+            NSArray *bucketNames = [[AmazonClientManager s3] listBuckets];
+            if (buckets == nil) {
+                buckets = [[NSMutableArray alloc] initWithCapacity:[bucketNames count]];
             }
-        }
+            else {
+                [buckets removeAllObjects];
+            }
 
-        [buckets sortUsingSelector:@selector(compare:)];
+            if (bucketNames != nil) {
+                for (S3Bucket *bucket in bucketNames) {
+                    [buckets addObject:[bucket name]];
+                }
+            }
+
+            [buckets sortUsingSelector:@selector(compare:)];
+        }
 
         dispatch_async(dispatch_get_main_queue(), ^{
 
@@ -114,14 +116,16 @@
                 [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
             });
 
-            S3DeleteBucketRequest *deleteBucketRequest = [[[S3DeleteBucketRequest alloc] initWithName:[buckets objectAtIndex:indexPath.row]] autorelease];
-            S3DeleteBucketResponse *deleteBucketResponse = [[AmazonClientManager s3] deleteBucket:deleteBucketRequest];
-            if(deleteBucketResponse.error != nil)
-            {
-                NSLog(@"Error: %@", deleteBucketResponse.error);
-            }
+            @autoreleasepool {
+                S3DeleteBucketRequest *deleteBucketRequest = [[[S3DeleteBucketRequest alloc] initWithName:[buckets objectAtIndex:indexPath.row]] autorelease];
+                S3DeleteBucketResponse *deleteBucketResponse = [[AmazonClientManager s3] deleteBucket:deleteBucketRequest];
+                if(deleteBucketResponse.error != nil)
+                {
+                    NSLog(@"Error: %@", deleteBucketResponse.error);
+                }
 
-            [buckets removeObjectAtIndex:indexPath.row];
+                [buckets removeObjectAtIndex:indexPath.row];
+            }
 
             dispatch_async(dispatch_get_main_queue(), ^{
 
